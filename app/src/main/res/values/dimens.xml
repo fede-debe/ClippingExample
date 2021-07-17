@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Define the dimensions that you'll be using for the clipped views in a new resources file in res/values/dimens.xml.
+ These default dimensions are hardcoded and sized to fit on a pretty small screen. There are dimensions for a clipping
+ rectangle, some insets and offsets, and text styling. -->
+<resources>
+    <dimen name="clipRectRight">90dp</dimen>
+    <dimen name="clipRectBottom">90dp</dimen>
+    <dimen name="clipRectTop">0dp</dimen>
+    <dimen name="clipRectLeft">0dp</dimen>
+
+    <dimen name="rectInset">8dp</dimen>
+    <dimen name="smallRectOffset">40dp</dimen>
+
+    <dimen name="circleRadius">30dp</dimen>
+    <dimen name="textOffset">20dp</dimen>
+    <dimen name="strokeWidth">4dp</dimen>
+
+    <dimen name="textSize">18sp</dimen>
+</resources>
