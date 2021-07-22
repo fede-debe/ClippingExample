@@ -187,7 +187,7 @@ class ClippedView @JvmOverloads constructor(
             circleRadius,clipRectBottom - circleRadius,
             circleRadius,Path.Direction.CCW
         )
-        // IF/ELSE for Deprecated method.The method clipPath(path, Region.Op.DIFFERENCE)
+        // IF/ELSE for Deprecated method(CHECKING FOR THE VERSIONS).The method clipPath(path, Region.Op.DIFFERENCE)
         // was deprecated in API level 26. The recommended alternative method is
         // clipOutPath(Path), which is currently available in
         // API level 26 and higher.
@@ -200,8 +200,37 @@ class ClippedView @JvmOverloads constructor(
         canvas.restore()
     }
 
-
+    /** Draw the intersection between 2 clipping rectangles in the second row and column. Depending on the screen resolution, the looks of this region will vary.
+     *  You can experiment a small rect offset dimension to change the size of the visible region. */
     private fun drawIntersectionClippingExample(canvas: Canvas) {
+
+        canvas.save()
+        canvas.translate(columnTwo,rowTwo)
+        canvas.clipRect(
+            clipRectLeft,clipRectTop,
+            clipRectRight - smallRectOffset,
+            clipRectBottom - smallRectOffset
+        )
+        // The method clipRect(float, float, float, float, Region.Op
+        // .INTERSECT) was deprecated in API level 26. The recommended
+        // alternative method is clipRect(float, float, float, float), which
+        // is currently available in API level 26 and higher.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            canvas.clipRect(
+                clipRectLeft + smallRectOffset,
+                clipRectTop + smallRectOffset,
+                clipRectRight,clipRectBottom,
+                Region.Op.INTERSECT // INTERSECTION
+            )
+        } else {
+            canvas.clipRect(
+                clipRectLeft + smallRectOffset,
+                clipRectTop + smallRectOffset,
+                clipRectRight,clipRectBottom
+            ) // intersecting rectangles
+        }
+        drawClippedRectangle(canvas)
+        canvas.restore()
     }
     private fun drawCombinedClippingExample(canvas: Canvas) {
     }
