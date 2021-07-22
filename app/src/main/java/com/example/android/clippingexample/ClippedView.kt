@@ -56,6 +56,7 @@ class ClippedView @JvmOverloads constructor(
     private val rowThree = rowTwo + rectInset + clipRectBottom
     private val rowFour = rowThree + rectInset + clipRectBottom
     private val textRow = rowFour + (1.5f * clipRectBottom)
+    private val rejectRow = rowFour + rectInset + 2*clipRectBottom // create a variable for the y coordinates of an additional row.
 
     /** In order to use a rounded rectangle(commonly used shape), create and initialize a rectangle variable. RectF is a class
      * that holds rectangle coordinates in floating point.
@@ -78,7 +79,7 @@ class ClippedView @JvmOverloads constructor(
         drawOutsideClippingExample(canvas)
         drawSkewedTextExample(canvas)
         drawTranslatedTextExample(canvas)
-        // drawQuickRejectExample(canvas)
+        drawQuickRejectExample(canvas)
     }
 
     /** inside this method set the boundaries of the clipping rectangle for the whole shape.
@@ -329,5 +330,32 @@ class ClippedView @JvmOverloads constructor(
         canvas.restore()
     }
     private fun drawQuickRejectExample(canvas: Canvas) {
+
+        val inClipRectangle = RectF(clipRectRight / 2,
+            clipRectBottom / 2,
+            clipRectRight * 2,
+            clipRectBottom * 2)
+
+        val notInClipRectangle = RectF(RectF(clipRectRight+1,
+            clipRectBottom+1,
+            clipRectRight * 2,
+            clipRectBottom * 2))
+
+        canvas.save()
+        canvas.translate(columnOne, rejectRow)
+        canvas.clipRect(
+            clipRectLeft,clipRectTop,
+            clipRectRight,clipRectBottom
+        )
+        if (canvas.quickReject(
+                inClipRectangle, Canvas.EdgeType.AA)) { // you can also use notInClipRectangle to change the output
+            canvas.drawColor(Color.WHITE)
+        }
+        else {
+            canvas.drawColor(Color.BLACK)
+            canvas.drawRect(inClipRectangle, paint
+            )
+        }
+        canvas.restore()
     }
 }
