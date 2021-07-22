@@ -1,10 +1,7 @@
 package com.example.android.clippingexample
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
@@ -19,7 +16,7 @@ class ClippedView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     /** In ClippedView define a variable paint of a Paint. Enable anti-aliasing, and use the stroke
-     * width and text size defined in the dimensions.
+     *  width and text size defined in the dimensions.
      * */
     private val paint = Paint().apply {
         // smooth out edges of what is drawn without affecting shape
@@ -50,7 +47,7 @@ class ClippedView @JvmOverloads constructor(
 
     /** The shapes for this app are displayed in 2 columns and 4 rows determined by the  values of the dimensions you set up */
     /** Set up the coordinates for two columns. */
-    private val columnOne =  rectInset
+    private val columnOne = rectInset
     private val columnTwo = columnOne + rectInset + clipRectRight
 
     /** Add the coordinates for each row, including the final row for the transformed text */
@@ -138,6 +135,13 @@ class ClippedView @JvmOverloads constructor(
         canvas.restore()
     }
 
+    /** Save the canvas. Translate the origin of the canvas into open space to the first row, second column, to the right of the first
+     *  rectangle. Apply two clipping rectangles. The DIFFERENCE operator subtracts the second rectangle from the first one. Note: The
+     *  method clipRect(float, float, float, float, Region.Op.DIFFERENCE) was deprecated in API level 26. The recommended alternative
+     *  method is clipOutRect(float, float, float, float), which is currently available in API level 26 and higher. So be sure to check
+     *  the SDK version and use the appropriate API. Call the drawClippedRectangle() method to draw the modified canvas. Restore the
+     *  canvas state.
+     *  */
     private fun drawDifferenceClippingExample(canvas: Canvas) {
         canvas.save()
         // Move the origin to the right for the next rectangle.
@@ -151,11 +155,52 @@ class ClippedView @JvmOverloads constructor(
         // The method clipRect(float, float, float, float, Region.Op
         // .DIFFERENCE) was deprecated in API level 26. The recommended
         // alternative method is clipOutRect(float, float, float, float),
-        // which is currently available in API level 26 and higher.
-        // TODO) if (Build.VERSION.SDK_INT
+        // which is currently available in API level 26 and higher. -> same fot clipOutPath
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            canvas.clipRect(
+                4 * rectInset,4 * rectInset,
+                clipRectRight - 4 * rectInset,
+                clipRectBottom - 4 * rectInset,
+                Region.Op.DIFFERENCE
+            )
+        else {
+            canvas.clipOutRect(
+                4 * rectInset,4 * rectInset,
+                clipRectRight - 4 * rectInset,
+                clipRectBottom - 4 * rectInset
+            )
+        }
+        drawClippedRectangle(canvas)
+        canvas.restore()
     }
+    /** It follows the same pattern as the previous method. Draw a rectangle that uses a circular clipping path. It means removing
+     * the circle and showing the gray background instead. */
     private fun drawCircularClippingExample(canvas: Canvas) {
+
+        canvas.save()
+        canvas.translate(columnOne, rowTwo)
+        // Clears any lines and curves from the path but unlike reset(),
+        // keeps the internal data structure for faster reuse.
+        path.rewind()
+        // add a circle for clipping
+        path.addCircle(
+            circleRadius,clipRectBottom - circleRadius,
+            circleRadius,Path.Direction.CCW
+        )
+        // IF/ELSE for Deprecated method.The method clipPath(path, Region.Op.DIFFERENCE)
+        // was deprecated in API level 26. The recommended alternative method is
+        // clipOutPath(Path), which is currently available in
+        // API level 26 and higher.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            canvas.clipPath(path, Region.Op.DIFFERENCE)
+        } else {
+            canvas.clipOutPath(path)
+        }
+        drawClippedRectangle(canvas)
+        canvas.restore()
     }
+
+
     private fun drawIntersectionClippingExample(canvas: Canvas) {
     }
     private fun drawCombinedClippingExample(canvas: Canvas) {
