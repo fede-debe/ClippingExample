@@ -57,6 +57,16 @@ class ClippedView @JvmOverloads constructor(
     private val rowFour = rowThree + rectInset + clipRectBottom
     private val textRow = rowFour + (1.5f * clipRectBottom)
 
+    /** In order to use a rounded rectangle(commonly used shape), create and initialize a rectangle variable. RectF is a class
+     * that holds rectangle coordinates in floating point.
+     * */
+    private var rectF = RectF(
+        rectInset,
+        rectInset,
+        clipRectRight - rectInset,
+        clipRectBottom - rectInset
+    )
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         drawBackAndUnclippedRectangle(canvas)
@@ -232,15 +242,91 @@ class ClippedView @JvmOverloads constructor(
         drawClippedRectangle(canvas)
         canvas.restore()
     }
+
+    /** Combine shapes, a circle and a rectangle, and draw any path to define a clipping region. */
     private fun drawCombinedClippingExample(canvas: Canvas) {
+
+        canvas.save()
+        canvas.translate(columnOne, rowThree)
+        path.rewind()
+        path.addCircle(
+            clipRectLeft + rectInset + circleRadius,
+            clipRectTop + circleRadius + rectInset,
+            circleRadius,Path.Direction.CCW
+        )
+        path.addRect(
+            clipRectRight / 2 - circleRadius,
+            clipRectTop + circleRadius + rectInset,
+            clipRectRight / 2 + circleRadius,
+            clipRectBottom - rectInset,Path.Direction.CCW
+        )
+        canvas.clipPath(path) // we are just clipping the path, we don't need to check different versions of the clipping method.
+        drawClippedRectangle(canvas)
+        canvas.restore()
     }
+
+    /** Add a Rounded rectangle which is a commonly used clipping shape. addRoundRect method takes a rectangle(rectF), X and Y values for
+     * the corner radius and the  directions to wind the round rectangles contour. Path.Direction specifies how close shapes are oriented
+     * when they are added to a path, and CCW stands for CounterClockWise.
+     * */
     private fun drawRoundedRectangleClippingExample(canvas: Canvas) {
+        canvas.save()
+        canvas.translate(columnTwo,rowThree)
+        path.rewind()
+        path.addRoundRect(
+            rectF,clipRectRight / 4,
+            clipRectRight / 4, Path.Direction.CCW
+        )
+        canvas.clipPath(path)
+        drawClippedRectangle(canvas)
+        canvas.restore()
     }
+
+    /** Here we clip outside of the rectangle by doubling the insets of the clipping rectangle*/
     private fun drawOutsideClippingExample(canvas: Canvas) {
+
+        canvas.save()
+        canvas.translate(columnOne,rowFour)
+        canvas.clipRect(2 * rectInset,2 * rectInset,
+            clipRectRight - 2 * rectInset,
+            clipRectBottom - 2 * rectInset)
+        drawClippedRectangle(canvas)
+        canvas.restore()
     }
+
+    /** Drawing text is not really different from any other shapes and you can apply transformations to text. You can translate texts by translating
+     *  the  canvas and drawing the text.
+     *  */
     private fun drawTranslatedTextExample(canvas: Canvas) {
+
+        canvas.save()
+        paint.color = Color.GREEN
+        // Align the RIGHT side of the text with the origin.
+        paint.textAlign = Paint.Align.LEFT
+        // Apply transformation to canvas.
+        canvas.translate(columnTwo,textRow)
+        // Draw text.
+        canvas.drawText(context.getString(R.string.translated),
+            clipRectLeft,clipRectTop,paint)
+        canvas.restore()
     }
+
+    /** You can also skew text, distort it in various ways. When you use View classes provided by the Android system,
+     * the system clips views for you to minimize overdraw. When you use custom View classes and override the onDraw()
+     * method, clipping what you draw becomes your responsibility.
+     * */
     private fun drawSkewedTextExample(canvas: Canvas) {
+
+        canvas.save()
+        paint.color = Color.YELLOW
+        paint.textAlign = Paint.Align.RIGHT
+        // Position text.
+        canvas.translate(columnTwo, textRow)
+        // Apply skew transformation.
+        canvas.skew(0.2f, 0.3f)
+        canvas.drawText(context.getString(R.string.skewed),
+            clipRectLeft, clipRectTop, paint)
+        canvas.restore()
     }
     private fun drawQuickRejectExample(canvas: Canvas) {
     }
